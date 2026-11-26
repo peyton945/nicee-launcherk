@@ -1,0 +1,38 @@
+
+name: Build NiceLauncher APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Gradle
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gradle
+
+      - name: Extract launcher
+        run: unzip -q NiceLauncher10-Radial-Redesign.zip -d project
+
+      - name: Build APK
+        run: |
+          cd project/NiceLauncher10
+          gradle assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NiceLauncher-debug-apk
+          path: project/NiceLauncher10/app/build/outputs/apk/debug/app-debug.apk
